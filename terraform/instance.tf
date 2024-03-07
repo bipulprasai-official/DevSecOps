@@ -7,11 +7,6 @@ resource "aws_instance" "web" {
   tags = {
     Name = "terraform-learn-state-ec2"
   }
+    user_data = file("${path.module}/script.sh")
 
-  user_data = <<EOF
-  #!/bin/bash
-  apt-get update
-  apt-get install nginx
-  echo "hi bipul" >/var/www/html/index.nginx-debian.html
-  EOF
 }
