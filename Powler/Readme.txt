@@ -15,3 +15,7 @@
 # <p>testing aws Iac with prowler</p>
 # $ prowler aws --list-categories
 # $ prowler aws --list-compliance
+# prowler aws  // it will security scan all the services on aws
+# prowler aws --services s3 ec2 // it will security scan s3 bucket and ec2 
+
+# prowler aws --excluded-checks s3_bucket_public_access // it will scan all the services except s3_bucket_public_access
