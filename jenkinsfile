@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+    
+    tools{
+        maven 'maven3'
+        jdk 'jdk17'
+    }
+    environment{
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+          stage('Git Checkout') {
+            steps {
+               git branch: 'main', url: 'https://github.com/bipulprasai-official/DevSecOps'
+            }
+        }
+           stage('EKart Compile') {
+            steps {
+                dir('Ekart') {
+                    script {
+                        // Add your build and deployment steps for the Ekart project
+                        sh 'mvn compile'  
+                    
+                    }
+                }
+            }
+        }
+          stage('Unit Test') {
+            steps {
+                echo 'mvn test -DskipTests=true'
+            }
+        }
+         stage('SonarQube Analysis') {
+             steps {
+                 withSonarQubeEnv('sonar'){
+                 sh '''
+                 $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=EKART -Dsonar.projectName=EKART \
+                 -Dsonar.java.binaries=. '''
+            }
+        }
+    }
+
+      stage('OWASP Dependency check') {
+             steps {
+                dependencyCheck additionalArguments: ' --scan ./', odcInstallation: 'DC'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+          stage('Build') {
+             steps {
+                script{
+                    dir('/var/lib/jenkins/workspace/mavencommerce/Ekart') {
+                         sh 'mvn clean package -DskipTests=true'
+                    }
+                }
+              
+            }
+        }
+
+         stage('Deploy to nexus') {
+             steps {
+                script {
+                      dir('/var/lib/jenkins/workspace/mavencommerce/Ekart') {
+                          withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true){
+                sh "mvn deploy -DskipTests=true"
+
+                      }
+                }
+             
+               }
+            }
+        }
+    }
+}
