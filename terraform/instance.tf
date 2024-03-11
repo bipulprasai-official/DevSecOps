@@ -3,10 +3,13 @@ resource "aws_instance" "web" {
   ami                    = var.image_id
   instance_type          = var.instance_type
   key_name               = aws_key_pair.key-tf.key_name
+  count                  = var.ec2_count
   vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
+  # user_data              = templatefile("./script.sh", {})
   tags = {
-    Name = "terraform-learn-state-ec2"
+    Name = "terraform-ec2 ${count.index}"
   }
-    user_data = file("${path.module}/script.sh")
-
+  root_block_device {
+    volume_size = 20 # Specify the desired disk size in GB
+  }
 }
