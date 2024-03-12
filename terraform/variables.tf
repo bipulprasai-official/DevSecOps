@@ -11,7 +11,7 @@ variable "instance_type" {
 
 variable "ec2_count" {
   type = string
-  default = "3"
+  default = "1"
 }
 
 variable "access_key" {

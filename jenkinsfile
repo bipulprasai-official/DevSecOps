@@ -48,15 +48,16 @@ pipeline {
 
       stage('OWASP Dependency check') {
              steps {
-                dependencyCheck additionalArguments: ' --scan ./', odcInstallation: 'DC'
+                dependencyCheck additionalArguments: ' --scan ./', odcInstallation: 'DPC'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
           stage('Build') {
              steps {
                 script{
-                    dir('/var/lib/jenkins/workspace/mavencommerce/Ekart') {
-                         sh 'mvn clean package -DskipTests=true'
+                  dir('Ekart') {
+                        echo "Current directory: ${pwd()}"
+                        sh 'mvn clean package -DskipTests=true'
                     }
                 }
               
@@ -66,7 +67,7 @@ pipeline {
          stage('Deploy to nexus') {
              steps {
                 script {
-                      dir('/var/lib/jenkins/workspace/mavencommerce/Ekart') {
+                      dir('Ekart') {
                           withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true){
                 sh "mvn deploy -DskipTests=true"
 

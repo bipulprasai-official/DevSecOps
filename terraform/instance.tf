@@ -10,6 +10,6 @@ resource "aws_instance" "web" {
     Name = "terraform-ec2 ${count.index}"
   }
   root_block_device {
-    volume_size = 20 # Specify the desired disk size in GB
+    volume_size = 30 # Specify the desired disk size in GB
   }
 }
